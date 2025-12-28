@@ -11,15 +11,20 @@
 void afficher_etat(int etage_ascenseur, int id_passager, char *action);
 
 // VARIABLES GLOBALES (Comme dans le Listing 6 du cours)
-Passager buffer;        // La donnée partagée (taille 1)
-pthread_mutex_t mutex;  // Pour protéger l'accès au buffer [cite: 469]
-sem_t *empty;           // Sémaphore : places libres 
-sem_t *full;            // Sémaphore : items disponibles 
+Passager buffer;                 // La donnée partagée (taille 1)
+pthread_mutex_t mutex;           // Pour protéger l'accès au buffer
+pthread_mutex_t mutex_affichage; // Pour protéger l'affichage
+sem_t *empty;                    // Sémaphore : places libres 
+sem_t *full;                     // Sémaphore : items disponibles 
+
+int passager_count;              // Compteur de passagers pour l'affichage
 
 /**
  * Consommateur : L'Ascenseur
  * L'ascenseur va consommer les requêtes réalisées par les usagers.
  * Il est initialisé au rez-de-chaussée (étage 0) et attend les demandes.
+ * 
+ * @return void*
  */
 void *thread_ascenseur(void *arg) {
     (void)arg;
@@ -86,6 +91,10 @@ void *thread_ascenseur(void *arg) {
         char info3[50];
         sprintf(info3, "Passager P%d est descendu", p.id);
         afficher_etat(etage_actuel, -1, info3);
+
+        pthread_mutex_lock(&mutex_affichage);
+        passager_count--;
+        pthread_mutex_unlock(&mutex_affichage);
         
         // On libère l'ascenseur (V)
         sem_post(empty);
@@ -96,6 +105,8 @@ void *thread_ascenseur(void *arg) {
 /**
  * Producteur : L'Usager
  * Chaque usager crée une requête pour aller d'un étage à un autre.
+ * 
+ * @return void*
  */
 void *thread_usager(void *arg) {
     Passager moi = *(Passager *)arg;
@@ -104,7 +115,10 @@ void *thread_usager(void *arg) {
 
     // Si le client est déjà à l'étage demandé.
     if (moi.etage_depart == moi.etage_destination) {
+        pthread_mutex_lock(&mutex_affichage);
+        passager_count--;
         printf("[USAGER %d] Demande annulée. Je suis déjà à l'étage %d, pas besoin d'ascenseur.\n", moi.id, moi.etage_depart);
+        pthread_mutex_unlock(&mutex_affichage);
         return NULL;
     }
 
@@ -125,6 +139,9 @@ void *thread_usager(void *arg) {
 
 /**
  * Lance la simulation V1 : Ascenseur capacité 1 personne
+ * 
+ * @param nb_usagers : Nombre d'usagers à simuler
+ * @return void
  */
 void run_elevator_v1(int nb_usagers) {
     printf("=== Lancement V1 (Strict Producteur-Consommateur) ===\n");
@@ -132,9 +149,12 @@ void run_elevator_v1(int nb_usagers) {
     pthread_t ascenseur;
     pthread_t threads_usagers[nb_usagers];   // Tableau des threads usagers
     Passager donnees_usagers[nb_usagers];    // Tableau pour stocker les infos
+    
+    passager_count = nb_usagers;
 
     // Initialisation Mutex
     pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutex_affichage, NULL);
 
     // Initialisation Sémaphores (Version Mac obligée)
     // empty = 1 (1 place disponible au départ)
@@ -157,9 +177,19 @@ void run_elevator_v1(int nb_usagers) {
     }
 
     // Attendre que tous les threads se terminent
-    for (int i = 0; i < nb_usagers; i++) {
-        pthread_join(threads_usagers[i], NULL);
+    // for (int i = 0; i < nb_usagers; i++) {
+    //     pthread_join(threads_usagers[i], NULL);
+    // }
+    while (1) {
+        pthread_mutex_lock(&mutex_affichage);
+        if (passager_count == 0) {
+            pthread_mutex_unlock(&mutex_affichage);
+            break;
+        }
+        pthread_mutex_unlock(&mutex_affichage);
+        sleep(1);
     }
+
 
     // Fermeture et destruction des sémaphores et mutex
     sem_close(empty);
