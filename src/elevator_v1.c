@@ -8,6 +8,8 @@
 #include "elevator.h"
 #include "common.h"
 
+void afficher_etat(int etage_ascenseur, int id_passager, char *action);
+
 // VARIABLES GLOBALES (Comme dans le Listing 6 du cours)
 Passager buffer;        // La donnée partagée (taille 1)
 pthread_mutex_t mutex;  // Pour protéger l'accès au buffer [cite: 469]
@@ -23,47 +25,69 @@ void *thread_ascenseur(void *arg) {
     (void)arg;
     int etage_actuel = 0;
 
-    while (1) {
-        if (etage_actuel == 0) {
-            printf("[ASCENSEUR] Je suis au RDC.\n");
-        } else {
-            printf("[ASCENSEUR] Je suis à l'étage %d.\n", etage_actuel);
-        }
+    // Affichage de l'entête du graphique une seule fois
+    printf("\n\t RDC | 1  | 2  | 3  | 4  |   ETAT ASCENSEUR\n");
+    printf("\t----------------------------------------------\n");
 
-        // On attend un passager
+    while (1) {
+        // État initial (Attente)
+        afficher_etat(etage_actuel, -1, "En attente...");
+
+        // On attend un passager (P)
         sem_wait(full); 
-        // On reccupere le passager
+        
+        // On récupère le passager (Section critique)
         pthread_mutex_lock(&mutex); 
         Passager p = buffer; 
         pthread_mutex_unlock(&mutex);
 
-        // On fait le trajet vers le passager
+        // On se rend à l'étage de départ du passager
         if (etage_actuel != p.etage_depart) {
-            printf("[ASCENSEUR] En route vers l'étage %d pour prendre en charge le passager %d.\n", p.etage_depart, p.id);
-            for (int i=0; i<abs(p.etage_depart - etage_actuel); i++) {
-                printf("[ASCENSEUR] ...\n");
-                sleep(1);
+            char info[50];
+            sprintf(info, "Je vais chercher P%d à l'étage %d", p.id, p.etage_depart);
+            
+            int direction = (p.etage_depart > etage_actuel) ? 1 : -1;
+
+            while (etage_actuel != p.etage_depart) {
+                sleep(1); 
+                etage_actuel += direction;
+                afficher_etat(etage_actuel, -1, info);
             }
-            etage_actuel = p.etage_depart;
         }
 
-        printf("[ASCENSEUR] Prise en charge passager %d (Etage %d -> %d)\n", p.id, etage_actuel, p.etage_destination);
-        sleep(2);         
+        // Le passager monte
+        afficher_etat(etage_actuel, -1, "Ouverture des portes ...");
+        sleep(2);
+        char info2[50];
+        sprintf(info2, "Passager P%d est monté", p.id);
+        afficher_etat(etage_actuel, p.id, info2);
+        afficher_etat(etage_actuel, p.id, "Fermeture des portes ...");
+        sleep(2);
 
 
-        // On fait le trajet vers la destination du passager
+
+        // On se rend à l'étage d'arrivée du passager
         if (etage_actuel != p.etage_destination) {
-            printf("[ASCENSEUR] En route vers l'étage %d pour déposer le passager %d.\n", p.etage_destination, p.id);
-            for (int i=0; i<abs(p.etage_destination - etage_actuel); i++) {
-                printf("[ASCENSEUR] ...\n");
+            char info[50];
+            sprintf(info, "Transport P%d -> %d", p.id, p.etage_destination);
+            
+            int direction = (p.etage_destination > etage_actuel) ? 1 : -1;
+
+            while (etage_actuel != p.etage_destination) {
                 sleep(1);
+                etage_actuel += direction;
+                afficher_etat(etage_actuel, p.id, info);
             }
-            etage_actuel = p.etage_destination;
         }
 
-        printf("[ASCENSEUR] Passager %d déposé à l'étage %d.\n", p.id, etage_actuel);
-
-        // On libere l'ascenseur
+        // On dépose le passager
+        afficher_etat(etage_actuel, p.id, "Ouverture des portes ...");
+        sleep(2);
+        char info3[50];
+        sprintf(info3, "Passager P%d est descendu", p.id);
+        afficher_etat(etage_actuel, -1, info3);
+        
+        // On libère l'ascenseur (V)
         sem_post(empty);
     }
     return NULL;
@@ -145,4 +169,34 @@ void run_elevator_v1(int nb_usagers) {
     pthread_mutex_destroy(&mutex);
     
     printf("=== Fin simulation ===\n");
+}
+
+
+/**
+ * Fonction d'affichage de l'état de l'ascenseur
+ * dans le terminal
+ * 
+ * @param etage_ascenseur : Étage actuel de l'ascenseur (0-4)
+ * @param id_passager : ID du passager dans l'ascenseur (-1 si vide)
+ * @param action : Description de l'action en cours
+ * @return void
+ */
+void afficher_etat(int etage_ascenseur, int id_passager, char *action) {
+    
+    printf("\t");
+
+    for (int i = 0; i < 5; i++) {
+        if (i == etage_ascenseur) {
+            // On verifie s'il s'agit d'un passager ou non
+            if (id_passager >= 0) {
+                printf("[\033[1;32mP%d\033[0m]", id_passager); 
+            } else {
+                printf("[\033[1;33m E \033[0m]"); 
+            }
+        } else {
+            printf("  |  ");
+        }
+    }
+
+    printf("   <-- %s\n", action);
 }
