@@ -10,8 +10,11 @@
 
 1. [Consignes](#consignes--simulation-dun-ascenseur-threads-et-mutex)
 2. [Implémentation](#implémentation)
-3. [Description](#Description)
+3. [Architecture technique](#Architecture-technique)
+	* [Code source](#Code-source)
+	* [Bibliothèques](#Bibliothèques)
 4. [Usage](#usage)
+5. [Tests](#tests)
 
 ## Consignes : Simulation d’un ascenseur (threads et mutex)
 **Contexte :**
@@ -83,13 +86,22 @@ La simulation propose un affichage pas à pas dans le terminal pour suivre l'asc
 === Fin simulation ===
 ```
 
-## Description
+## Architecture technique
+### Code source
 Ce dépot est décomposé en deux sous-dossiers : 
 * **[doc](./doc/)** : Qui contient la documentation (le sujet ainsi que le [compte rendu](./doc/compte_rendu.pdf))
 * **[src](./src/)** : Qui contient le code source du projet dont :
 	- **[simulation.h](./src/simulation.h)** : Fichier qui contient la définition des prototypes et de la structure Passager
 	- **[simulation.c](./src/simulation.c)** : Fichier qui contient toute la logique métier notamment les fonctions des threads (ascenseur/usager), la gestion des sémaphores/mutex et la fonction d'affichage graphique
 	- **[main.c](./src/main.c)** : Point d'entré du programme qui gère la réccuperation des arguments (le nombre d'usager) et lance la simulation
+
+### Bibliothèques
+La projet repose sur des bibliothèques standards du langage C et des bibliothuèques POSIX pour la gestion des threads:
+* **<pthread.h>** : Fournit les fonctions nécessaires à la création et à la gestion des threads ainsi que les mutex
+* **<semaphore.h>** : Utilisée pour contrôler l'accès aux ressources partagées et synchroniser les flux producteurs-consommateurs
+* **<fnctl.h>** : Car développement sur macOS pour l'utilisation des constante lors de l'initialisation des sémaphores nommés
+* **<unistd.h>** : permet l'utilisation des fonctions sleep et usleep pour simuler les temps de trajets 
+
 
 ## Usage
 Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
@@ -108,6 +120,8 @@ Finalement pour supprimer l'exécutable :
 ```bash
 rm ElevatorSimulation
 ```
+
+## Tests
 
 
 
