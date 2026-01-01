@@ -1,25 +1,28 @@
+/*
+* Ficher : main.c
+* Auteur : ELKHALKI Yassine
+* Description : Point d'entrée principal pour lancer une simulation d'ascenseur avec un nombre spécifié d'usagers.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "elevator.h"
+#include "simulation.h"
 
 int main(int argc, char *argv[]) {
-    if (argc < 3) {
-        printf("Usage: %s <version> <nombre_usagers>\n", argv[0]);
-        printf("Exemple: %s v1 5\n", argv[0]);
+    // Vérification des arguments
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <nombre_usagers>\n", argv[0]);
         return 1;
     }
 
-    char *version = argv[1];
-    int nb_usagers = atoi(argv[2]);
-
-    if (strcmp(version, "v1") == 0) {
-        run_elevator_v1(nb_usagers);
-    } 
-    // Tu ajouteras v2 et v3 ici plus tard
-    else {
-        printf("Version inconnue. Utilisez 'v1'.\n");
+    int nb_usagers = atoi(argv[1]);
+    if (nb_usagers <= 0) {
+        fprintf(stderr, "Erreur: Le nombre d'usagers doit être > 0.\n");
+        return 1;
     }
+
+    // Lancement de la simulation unique
+    run_elevator_simulation(nb_usagers);
 
     return 0;
 }

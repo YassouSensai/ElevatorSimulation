@@ -9,8 +9,9 @@
 ## Sommaire
 
 1. [Consignes](#consignes--simulation-dun-ascenseur-threads-et-mutex)
-2. [Implémentations](#implémentations)
-3. [Usage](#usage)
+2. [Implémentation](#implémentation)
+3. [Description](#Description)
+4. [Usage](#usage)
 
 ## Consignes : Simulation d’un ascenseur (threads et mutex)
 **Contexte :**
@@ -26,7 +27,7 @@
 * Synchronisation avancée des threads.
 * Gestion des événements concurrents.
 
-## Implémentations 
+## Implémentation 
 > L'ascenseur implémenté est un petit ascenseur. Il ne peut prendre qu'une personne à la fois.
 
 Cette version repose sur le modèle Producteur-Consommateur décrit dans le cours. J'utilise donc :
@@ -39,56 +40,75 @@ Cette version repose sur le modèle Producteur-Consommateur décrit dans le cour
 La simulation propose un affichage pas à pas dans le terminal pour suivre l'ascenceur à travers les 5 étages. Voici un aperçu du rendu : 
 
 ```plaintext
+=== Lancement simulation Ascenseur avec 4 usagers ===
+
+
 	 RDC | 1  | 2  | 3  | 4  |   ETAT ASCENSEUR
 	----------------------------------------------
 	[ E ]  |    |    |    |     <-- En attente...
-[USAGER 0] Je veux aller de 2 à 4.
-[USAGER 0] C'est moi le prochain !
-	  |  [ E ]  |    |    |     <-- Je vais chercher P0 à l'étage 2
-[USAGER 1] Je veux aller de 3 à 3.
-[USAGER 1] Demande annulée. Je suis déjà à l'étage 3, pas besoin d'ascenseur.
-	  |    |  [ E ]  |    |     <-- Je vais chercher P0 à l'étage 2
-	  |    |  [ E ]  |    |     <-- Ouverture des portes ...
-[USAGER 2] Je veux aller de 0 à 2.
-	  |    |  [P0]  |    |     <-- Passager P0 est monté
-	  |    |  [P0]  |    |     <-- Fermeture des portes ...
-	  |    |    |  [P0]  |     <-- Transport P0 -> 4
-	  |    |    |    |  [P0]   <-- Transport P0 -> 4
-	  |    |    |    |  [P0]   <-- Ouverture des portes ...
-	  |    |    |    |  [ E ]   <-- Passager P0 est descendu
-	  |    |    |    |  [ E ]   <-- En attente...
-[USAGER 2] C'est moi le prochain !
-	  |    |    |  [ E ]  |     <-- Je vais chercher P2 à l'étage 0
-	  |    |  [ E ]  |    |     <-- Je vais chercher P2 à l'étage 0
-	  |  [ E ]  |    |    |     <-- Je vais chercher P2 à l'étage 0
-	[ E ]  |    |    |    |     <-- Je vais chercher P2 à l'étage 0
-	[ E ]  |    |    |    |     <-- Ouverture des portes ...
-	[P2]  |    |    |    |     <-- Passager P2 est monté
-	[P2]  |    |    |    |     <-- Fermeture des portes ...
-	  |  [P2]  |    |    |     <-- Transport P2 -> 2
-	  |    |  [P2]  |    |     <-- Transport P2 -> 2
-	  |    |  [P2]  |    |     <-- Ouverture des portes ...
-	  |    |  [ E ]  |    |     <-- Passager P2 est descendu
+[PASSAGER 0] Je veux aller de 4 à 2.
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 0 !
+[PASSAGER 1] Je veux aller de 1 à 1.
+[PASSAGER 1] Demande annulée. Je suis déjà à l'étage 1, pas besoin d'ascenseur.
+[PASSAGER 2] Je veux aller de 4 à 0.
+	  |  [ E ]  |    |    |     <-- Je vais chercher P0 à l'étage 4
+[PASSAGER 3] Je veux aller de 2 à 2.
+[PASSAGER 3] Demande annulée. Je suis déjà à l'étage 2, pas besoin d'ascenseur.
+	  |    |  [ E ]  |    |     <-- Je vais chercher P0 à l'étage 4
+	  |    |    |  [ E ]  |     <-- Je vais chercher P0 à l'étage 4
+	  |    |    |    |  [ E ]   <-- Je vais chercher P0 à l'étage 4
+	  |    |    |    |  [ E ]   <-- Ouverture des portes ...
+	  |    |    |    |  [ P0]   <-- Passager P0 est monté
+	  |    |    |    |  [ P0]   <-- Fermeture des portes ...
+	  |    |    |  [ P0]  |     <-- Transport P0 -> 2
+	  |    |  [ P0]  |    |     <-- Transport P0 -> 2
+	  |    |  [ P0]  |    |     <-- Ouverture des portes ...
+	  |    |  [ E ]  |    |     <-- Passager P0 est descendu
 	  |    |  [ E ]  |    |     <-- En attente...
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 2 !
+	  |    |    |  [ E ]  |     <-- Je vais chercher P2 à l'étage 4
+	  |    |    |    |  [ E ]   <-- Je vais chercher P2 à l'étage 4
+	  |    |    |    |  [ E ]   <-- Ouverture des portes ...
+	  |    |    |    |  [ P2]   <-- Passager P2 est monté
+	  |    |    |    |  [ P2]   <-- Fermeture des portes ...
+	  |    |    |  [ P2]  |     <-- Transport P2 -> 0
+	  |    |  [ P2]  |    |     <-- Transport P2 -> 0
+	  |  [ P2]  |    |    |     <-- Transport P2 -> 0
+	[ P2]  |    |    |    |     <-- Transport P2 -> 0
+	[ P2]  |    |    |    |     <-- Ouverture des portes ...
+	[ E ]  |    |    |    |     <-- Passager P2 est descendu
+	[ E ]  |    |    |    |     <-- En attente...
+
+
+=== Fin simulation ===
 ```
+
+## Description
+Ce dépot est décomposé en deux sous-dossiers : 
+* **[doc](./doc/)** : Qui contient la documentation (le sujet ainsi que le [compte rendu](./doc/compte_rendu.pdf))
+* **[src](./src/)** : Qui contient le code source du projet dont :
+	- **[simulation.h](./src/simulation.h)** : Fichier qui contient la définition des prototypes et de la structure Passager
+	- **[simulation.c](./src/simulation.c)** : Fichier qui contient toute la logique métier notamment les fonctions des threads (ascenseur/usager), la gestion des sémaphores/mutex et la fonction d'affichage graphique
+	- **[main.c](./src/main.c)** : Point d'entré du programme qui gère la réccuperation des arguments (le nombre d'usager) et lance la simulation
 
 ## Usage
-Le projet utilise un ```Makefile``` avec le compilateur ```gcc```. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
+Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
 
 ```bash
-make
+gcc -Wall -pthread src/main.c src/simulation.c -o ElevatorSimulation
 ```
 
-un exécutable du nom de ```ElevatorSimulation``` sera créé et il attend en paramètre la version du simulateur ainsi que le nombre d'usagers.
-
+un exécutable du nom de ```ElevatorSimulation``` sera créé et il attend en paramètre le nombre d'usagers.
+Pour exécuter :
 ```bash
-./ElevatorSimulation v1 4
+./ElevatorSimulation 4
 ```
 
-Pour supprimer les fichiers objets aisni que l'exécutable, vous pouvez lancer cette commande :
-
+Finalement pour supprimer l'exécutable :
 ```bash
-make clean
+rm ElevatorSimulation
 ```
+
+
 
 

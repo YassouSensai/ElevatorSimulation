@@ -1,3 +1,9 @@
+/*
+* Fichier : simulation.c
+* Auteur : ELKHALKI Yassine
+* Description : Implémentation d'une simulation d'ascenseur avec un usager à la fois (capacité 1 personne).
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,8 +11,7 @@
 #include <semaphore.h>
 #include <fcntl.h>      // Nécessaire pour O_CREAT sur Mac
 
-#include "elevator.h"
-#include "common.h"
+#include "simulation.h"
 
 void afficher_etat(int etage_ascenseur, int id_passager, char *action);
 
@@ -46,6 +51,9 @@ void *thread_ascenseur(void *arg) {
         Passager p = buffer; 
         pthread_mutex_unlock(&mutex);
 
+        printf("[ASCENSEUR] PRISE EN CHARGE PASSAGER %d !\n", p.id);
+
+
         // On se rend à l'étage de départ du passager
         if (etage_actuel != p.etage_depart) {
             char info[50];
@@ -54,7 +62,7 @@ void *thread_ascenseur(void *arg) {
             int direction = (p.etage_depart > etage_actuel) ? 1 : -1;
 
             while (etage_actuel != p.etage_depart) {
-                sleep(1); 
+                usleep(500000);
                 etage_actuel += direction;
                 afficher_etat(etage_actuel, -1, info);
             }
@@ -62,14 +70,12 @@ void *thread_ascenseur(void *arg) {
 
         // Le passager monte
         afficher_etat(etage_actuel, -1, "Ouverture des portes ...");
-        sleep(2);
+        sleep(1);
         char info2[50];
         sprintf(info2, "Passager P%d est monté", p.id);
         afficher_etat(etage_actuel, p.id, info2);
         afficher_etat(etage_actuel, p.id, "Fermeture des portes ...");
-        sleep(2);
-
-
+        sleep(1);
 
         // On se rend à l'étage d'arrivée du passager
         if (etage_actuel != p.etage_destination) {
@@ -79,7 +85,7 @@ void *thread_ascenseur(void *arg) {
             int direction = (p.etage_destination > etage_actuel) ? 1 : -1;
 
             while (etage_actuel != p.etage_destination) {
-                sleep(1);
+                usleep(500000); /* 0.5 seconde */
                 etage_actuel += direction;
                 afficher_etat(etage_actuel, p.id, info);
             }
@@ -87,7 +93,7 @@ void *thread_ascenseur(void *arg) {
 
         // On dépose le passager
         afficher_etat(etage_actuel, p.id, "Ouverture des portes ...");
-        sleep(2);
+        sleep(1);
         char info3[50];
         sprintf(info3, "Passager P%d est descendu", p.id);
         afficher_etat(etage_actuel, -1, info3);
@@ -111,13 +117,13 @@ void *thread_ascenseur(void *arg) {
 void *thread_usager(void *arg) {
     Passager moi = *(Passager *)arg;
 
-    printf("[USAGER %d] Je veux aller de %d à %d.\n", moi.id, moi.etage_depart, moi.etage_destination);
+    printf("[PASSAGER %d] Je veux aller de %d à %d.\n", moi.id, moi.etage_depart, moi.etage_destination);
 
     // Si le client est déjà à l'étage demandé.
     if (moi.etage_depart == moi.etage_destination) {
         pthread_mutex_lock(&mutex_affichage);
         passager_count--;
-        printf("[USAGER %d] Demande annulée. Je suis déjà à l'étage %d, pas besoin d'ascenseur.\n", moi.id, moi.etage_depart);
+        printf("[PASSAGER %d] Demande annulée. Je suis déjà à l'étage %d, pas besoin d'ascenseur.\n", moi.id, moi.etage_depart);
         pthread_mutex_unlock(&mutex_affichage);
         return NULL;
     }
@@ -133,7 +139,6 @@ void *thread_usager(void *arg) {
     // On prévient que l'ascenseur est plein (V)
     sem_post(full); 
 
-    printf("[USAGER %d] C'est moi le prochain !\n", moi.id);
     return NULL;
 }
 
@@ -143,8 +148,8 @@ void *thread_usager(void *arg) {
  * @param nb_usagers : Nombre d'usagers à simuler
  * @return void
  */
-void run_elevator_v1(int nb_usagers) {
-    printf("=== Lancement V1 (Strict Producteur-Consommateur) ===\n");
+void run_elevator_simulation(int nb_usagers) {
+    printf("\n\n=== Lancement simulation Ascenseur avec %d usagers ===\n\n", nb_usagers);
 
     pthread_t ascenseur;
     pthread_t threads_usagers[nb_usagers];   // Tableau des threads usagers
@@ -167,13 +172,15 @@ void run_elevator_v1(int nb_usagers) {
     // Création thread Ascenseur
     pthread_create(&ascenseur, NULL, thread_ascenseur, NULL);
 
+    srand(time(NULL));
+
     // Création threads Usagers
     for (int i = 0; i < nb_usagers; i++) {
         donnees_usagers[i].id = i;
         donnees_usagers[i].etage_depart = rand() % 5;
         donnees_usagers[i].etage_destination = rand() % 5;
         pthread_create(&threads_usagers[i], NULL, thread_usager, &donnees_usagers[i]);
-        sleep(1);
+        usleep(200000);
     }
 
     // Attendre que tous les threads se terminent
@@ -198,7 +205,7 @@ void run_elevator_v1(int nb_usagers) {
     sem_unlink("/sem_v1_full");
     pthread_mutex_destroy(&mutex);
     
-    printf("=== Fin simulation ===\n");
+    printf("\n\n=== Fin simulation ===\n\n");
 }
 
 
@@ -219,7 +226,7 @@ void afficher_etat(int etage_ascenseur, int id_passager, char *action) {
         if (i == etage_ascenseur) {
             // On verifie s'il s'agit d'un passager ou non
             if (id_passager >= 0) {
-                printf("[\033[1;32mP%d\033[0m]", id_passager); 
+                printf("[\033[1;32m P%d\033[0m]", id_passager); 
             } else {
                 printf("[\033[1;33m E \033[0m]"); 
             }
