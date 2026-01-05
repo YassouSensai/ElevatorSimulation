@@ -27,6 +27,7 @@
 	* [Code source](#Code-source)
 	* [Bibliothèques](#Bibliothèques)
 	* [Déroulement](#Déroulement)
+	* [Affichage](#Affichage)
 4. [Usage](#usage)
 5. [Tests](#tests)
 
@@ -58,44 +59,70 @@ Cette version repose sur le modèle Producteur-Consommateur décrit dans le cour
 La simulation propose un affichage pas à pas dans le terminal pour suivre l'ascenceur à travers les 5 étages. Voici un aperçu du rendu : 
 
 ```plaintext
-=== Lancement simulation Ascenseur avec 4 usagers ===
+=== Lancement simulation Ascenseur avec 5 usagers ===
 
 
 	 RDC | 1  | 2  | 3  | 4  |   ETAT ASCENSEUR
 	----------------------------------------------
 	[ E ]  |    |    |    |     <-- En attente...
-[PASSAGER 0] Je veux aller de 4 à 2.
+[PASSAGER 0] Je veux aller de 0 à 4.
 [ASCENSEUR] PRISE EN CHARGE PASSAGER 0 !
-[PASSAGER 1] Je veux aller de 1 à 1.
-[PASSAGER 1] Demande annulée. Je suis déjà à l'étage 1, pas besoin d'ascenseur.
-[PASSAGER 2] Je veux aller de 4 à 0.
-	  |  [ E ]  |    |    |     <-- Je vais chercher P0 à l'étage 4
-[PASSAGER 3] Je veux aller de 2 à 2.
-[PASSAGER 3] Demande annulée. Je suis déjà à l'étage 2, pas besoin d'ascenseur.
-	  |    |  [ E ]  |    |     <-- Je vais chercher P0 à l'étage 4
-	  |    |    |  [ E ]  |     <-- Je vais chercher P0 à l'étage 4
-	  |    |    |    |  [ E ]   <-- Je vais chercher P0 à l'étage 4
-	  |    |    |    |  [ E ]   <-- Ouverture des portes ...
-	  |    |    |    |  [ P0]   <-- Passager P0 est monté
-	  |    |    |    |  [ P0]   <-- Fermeture des portes ...
-	  |    |    |  [ P0]  |     <-- Transport P0 -> 2
-	  |    |  [ P0]  |    |     <-- Transport P0 -> 2
-	  |    |  [ P0]  |    |     <-- Ouverture des portes ...
-	  |    |  [ E ]  |    |     <-- Passager P0 est descendu
-	  |    |  [ E ]  |    |     <-- En attente...
+	[ E ]  |    |    |    |     <-- Ouverture des portes ...
+[PASSAGER 1] Je veux aller de 0 à 4.
+[PASSAGER 2] Je veux aller de 0 à 1.
+[PASSAGER 3] Je veux aller de 0 à 3.
+[PASSAGER 4] Je veux aller de 2 à 1.
+	[ P0]  |    |    |    |     <-- Passager P0 est monté
+	[ P0]  |    |    |    |     <-- Fermeture des portes ...
+	  |  [ P0]  |    |    |     <-- Transport P0 -> 4
+	  |    |  [ P0]  |    |     <-- Transport P0 -> 4
+	  |    |    |  [ P0]  |     <-- Transport P0 -> 4
+	  |    |    |    |  [ P0]   <-- Transport P0 -> 4
+	  |    |    |    |  [ P0]   <-- Ouverture des portes ...
+	  |    |    |    |  [ E ]   <-- Passager P0 est descendu
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 1 !
+	  |    |    |  [ E ]  |     <-- Je vais chercher P1 à l'étage 0
+	  |    |  [ E ]  |    |     <-- Je vais chercher P1 à l'étage 0
+	  |  [ E ]  |    |    |     <-- Je vais chercher P1 à l'étage 0
+	[ E ]  |    |    |    |     <-- Je vais chercher P1 à l'étage 0
+	[ E ]  |    |    |    |     <-- Ouverture des portes ...
+	[ P1]  |    |    |    |     <-- Passager P1 est monté
+	[ P1]  |    |    |    |     <-- Fermeture des portes ...
+	  |  [ P1]  |    |    |     <-- Transport P1 -> 4
+	  |    |  [ P1]  |    |     <-- Transport P1 -> 4
+	  |    |    |  [ P1]  |     <-- Transport P1 -> 4
+	  |    |    |    |  [ P1]   <-- Transport P1 -> 4
+	  |    |    |    |  [ P1]   <-- Ouverture des portes ...
+	  |    |    |    |  [ E ]   <-- Passager P1 est descendu
 [ASCENSEUR] PRISE EN CHARGE PASSAGER 2 !
-	  |    |    |  [ E ]  |     <-- Je vais chercher P2 à l'étage 4
-	  |    |    |    |  [ E ]   <-- Je vais chercher P2 à l'étage 4
-	  |    |    |    |  [ E ]   <-- Ouverture des portes ...
-	  |    |    |    |  [ P2]   <-- Passager P2 est monté
-	  |    |    |    |  [ P2]   <-- Fermeture des portes ...
-	  |    |    |  [ P2]  |     <-- Transport P2 -> 0
-	  |    |  [ P2]  |    |     <-- Transport P2 -> 0
-	  |  [ P2]  |    |    |     <-- Transport P2 -> 0
-	[ P2]  |    |    |    |     <-- Transport P2 -> 0
-	[ P2]  |    |    |    |     <-- Ouverture des portes ...
-	[ E ]  |    |    |    |     <-- Passager P2 est descendu
-	[ E ]  |    |    |    |     <-- En attente...
+	  |    |    |  [ E ]  |     <-- Je vais chercher P2 à l'étage 0
+	  |    |  [ E ]  |    |     <-- Je vais chercher P2 à l'étage 0
+	  |  [ E ]  |    |    |     <-- Je vais chercher P2 à l'étage 0
+	[ E ]  |    |    |    |     <-- Je vais chercher P2 à l'étage 0
+	[ E ]  |    |    |    |     <-- Ouverture des portes ...
+	[ P2]  |    |    |    |     <-- Passager P2 est monté
+	[ P2]  |    |    |    |     <-- Fermeture des portes ...
+	  |  [ P2]  |    |    |     <-- Transport P2 -> 1
+	  |  [ P2]  |    |    |     <-- Ouverture des portes ...
+	  |  [ E ]  |    |    |     <-- Passager P2 est descendu
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 3 !
+	[ E ]  |    |    |    |     <-- Je vais chercher P3 à l'étage 0
+	[ E ]  |    |    |    |     <-- Ouverture des portes ...
+	[ P3]  |    |    |    |     <-- Passager P3 est monté
+	[ P3]  |    |    |    |     <-- Fermeture des portes ...
+	  |  [ P3]  |    |    |     <-- Transport P3 -> 3
+	  |    |  [ P3]  |    |     <-- Transport P3 -> 3
+	  |    |    |  [ P3]  |     <-- Transport P3 -> 3
+	  |    |    |  [ P3]  |     <-- Ouverture des portes ...
+	  |    |    |  [ E ]  |     <-- Passager P3 est descendu
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 4 !
+	  |    |  [ E ]  |    |     <-- Je vais chercher P4 à l'étage 2
+	  |    |  [ E ]  |    |     <-- Ouverture des portes ...
+	  |    |  [ P4]  |    |     <-- Passager P4 est monté
+	  |    |  [ P4]  |    |     <-- Fermeture des portes ...
+	  |  [ P4]  |    |    |     <-- Transport P4 -> 1
+	  |  [ P4]  |    |    |     <-- Ouverture des portes ...
+	  |  [ E ]  |    |    |     <-- Passager P4 est descendu
 
 
 === Fin simulation ===
@@ -124,6 +151,18 @@ La projet repose sur des bibliothèques standards du langage C et des bibliothu�
 * **Fonction *thread_ascenseur*** : Il s'agit de la fonction qui attend les passager et simule le déroulement de l'ascenseur. Il y a des sleep pour simuler les pauses et les temps d'attentes.
 * **Fonction afficher_etat** : Il s'agit d'une fonction d'affichage pour gerer l'affichage un peu à la manière d'un diagramme d'état de l'ascenseur et des passagers.
 
+### Affichage
+L'affichage est géré sous forme de diagramme d'états avec les étages des l'ascenseur et l'état de l'ascenseur. Exemples avec l'affichage précendent.
+- Les requêtes des passagers sont affichées en lignes et le signalement de prise en charge de la part de l'ascenseur également 
+	- **Requête :** [PASSAGER 0] Je veux aller de 0 à 4.
+	- **Signalement de prise en charge :** [ASCENSEUR] PRISE EN CHARGE PASSAGER 1 !  
+
+- Les déplacements de l'ascenseurs sont affichés dans les colonnes des étages
+	- **[ E ] :** Pour ascenseur vide en déplacement ou en attente
+	- **[ Pn] :** Pour ascenseur avec le passager n
+
+- L'état de l'ascenseur est décrit dans la colonne ETAT ascenseur
+
 
 ## Usage
 Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
@@ -148,6 +187,38 @@ rm ElevatorSimulation
 ```
 
 ## Tests
+Les tests d'affichages sont fait sur la base de l'execution suivante :
+```bash
+./ElevatorSimulation v1 10
+```
+
+* Ascenseur qui monte puis descend & passagers pris dans le mauvais ordre de la boucle de créations des passagers :
+	- Le passager 3 est pris en charge au RDC (étage 0), puis l'ascenseur se rend à l'étage de destination qui est le 4. Puis l'ascenseur prend en charge le passager 1 à l'étage 3 donc il descend le chercher et le ramène à destination au deuxième en descendant.
+	- Le passager 3 est pris en charge avant le passager 1 => le thread du p3 est arrivé avant celui du P1 à l'ascenseur 
+
+```plaintext
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 3 !
+	[ E ]  |    |    |    |     <-- Je vais chercher P3 à l'étage 0
+	[ E ]  |    |    |    |     <-- Ouverture des portes ...
+	[ P3]  |    |    |    |     <-- Passager P3 est monté
+	[ P3]  |    |    |    |     <-- Fermeture des portes ...
+	  |  [ P3]  |    |    |     <-- Transport P3 -> 4
+	  |    |  [ P3]  |    |     <-- Transport P3 -> 4
+	  |    |    |  [ P3]  |     <-- Transport P3 -> 4
+	  |    |    |    |  [ P3]   <-- Transport P3 -> 4
+	  |    |    |    |  [ P3]   <-- Ouverture des portes ...
+	  |    |    |    |  [ E ]   <-- Passager P3 est descendu
+[ASCENSEUR] PRISE EN CHARGE PASSAGER 1 !
+	  |    |    |  [ E ]  |     <-- Je vais chercher P1 à l'étage 3
+	  |    |    |  [ E ]  |     <-- Ouverture des portes ...
+	  |    |    |  [ P1]  |     <-- Passager P1 est monté
+	  |    |    |  [ P1]  |     <-- Fermeture des portes ...
+	  |    |  [ P1]  |    |     <-- Transport P1 -> 2
+	  |    |  [ P1]  |    |     <-- Ouverture des portes ...
+	  |    |  [ E ]  |    |     <-- Passager P1 est descendu
+```
+
+
 
 
 

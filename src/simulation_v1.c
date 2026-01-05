@@ -38,11 +38,11 @@ void *thread_ascenseur(void *arg) {
     // Affichage de l'entête du graphique une seule fois
     printf("\n\t RDC | 1  | 2  | 3  | 4  |   ETAT ASCENSEUR\n");
     printf("\t----------------------------------------------\n");
+    
+    // État initial (Attente)
+    afficher_etat(etage_actuel, -1, "En attente...");
 
     while (1) {
-        // État initial (Attente)
-        afficher_etat(etage_actuel, -1, "En attente...");
-
         // On attend un passager (P)
         sem_wait(full); 
         
