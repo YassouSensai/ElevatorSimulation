@@ -107,7 +107,7 @@ La projet repose sur des bibliothèques standards du langage C et des bibliothu�
 Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
 
 ```bash
-gcc -Wall -pthread src/main.c src/simulation.c -o ElevatorSimulation
+gcc -Wall -pthread src/main.c src/simulation_v1.c -o ElevatorSimulation
 ```
 
 un exécutable du nom de ```ElevatorSimulation``` sera créé et il attend en paramètre le nombre d'usagers.

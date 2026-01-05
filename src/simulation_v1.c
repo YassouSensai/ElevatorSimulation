@@ -148,7 +148,7 @@ void *thread_usager(void *arg) {
  * @param nb_usagers : Nombre d'usagers à simuler
  * @return void
  */
-void run_elevator_simulation(int nb_usagers) {
+void run_simulation_v1(int nb_usagers) {
     printf("\n\n=== Lancement simulation Ascenseur avec %d usagers ===\n\n", nb_usagers);
 
     pthread_t ascenseur;
