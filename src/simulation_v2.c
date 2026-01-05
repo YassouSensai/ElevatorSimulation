@@ -77,7 +77,7 @@ void *thread_ascenseur_v2(void *arg) {
             
             // Astuce : On regarde si quelqu'un attend. Si non, on bloque sur sem_full.
             // Si oui, on continue pour aller le chercher.
-            int val; 
+            // int val; 
             // Sur mac sem_getvalue est deprecated, on utilise notre compteur manuel
             pthread_mutex_lock(&mutex_data);
             int waiting = nb_en_attente;

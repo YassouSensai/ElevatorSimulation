@@ -13,6 +13,7 @@
 3. [Architecture technique](#Architecture-technique)
 	* [Code source](#Code-source)
 	* [Bibliothèques](#Bibliothèques)
+	* [Déroulement](#Déroulement)
 4. [Usage](#usage)
 5. [Tests](#tests)
 
@@ -31,7 +32,8 @@
 * Gestion des événements concurrents.
 
 ## Implémentation 
-> L'ascenseur implémenté est un petit ascenseur. Il ne peut prendre qu'une personne à la fois.
+> - L'ascenseur implémenté est un petit ascenseur. Il ne peut prendre qu'une personne à la fois.  
+> - Une V2 est en cours d'implémentation (branche **v2**) qui permet de prendre plusieurs passagers se basant sur l'algorithme SCAN (Elevator Algorithm).
 
 Cette version repose sur le modèle Producteur-Consommateur décrit dans le cours. J'utilise donc :
 
@@ -92,7 +94,8 @@ Ce dépot est décomposé en deux sous-dossiers :
 * **[doc](./doc/)** : Qui contient la documentation (le sujet ainsi que le [compte rendu](./doc/compte_rendu.pdf))
 * **[src](./src/)** : Qui contient le code source du projet dont :
 	- **[simulation.h](./src/simulation.h)** : Fichier qui contient la définition des prototypes et de la structure Passager
-	- **[simulation.c](./src/simulation.c)** : Fichier qui contient toute la logique métier notamment les fonctions des threads (ascenseur/usager), la gestion des sémaphores/mutex et la fonction d'affichage graphique
+	- **[simulation_v1.c](./src/simulation.c)** : Fichier qui contient toute la logique métier de la version 1 notamment les fonctions des threads (ascenseur/usager), la gestion des sémaphores/mutex et la fonction d'affichage graphique
+	- **[simulation_v2.c](./src/simulation_v2.c)** : Fichier de la version 2 en cours d'implémentation.
 	- **[main.c](./src/main.c)** : Point d'entré du programme qui gère la réccuperation des arguments (le nombre d'usager) et lance la simulation
 
 ### Bibliothèques
@@ -102,6 +105,12 @@ La projet repose sur des bibliothèques standards du langage C et des bibliothu�
 * **<fnctl.h>** : Car développement sur macOS pour l'utilisation des constante lors de l'initialisation des sémaphores nommés
 * **<unistd.h>** : permet l'utilisation des fonctions sleep et usleep pour simuler les temps de trajets 
 
+### Déroulement
+* **Fonction run_simulation_v1** : Il s'agit de la fonction qui initialise mes variables globales ainsi que les passagers de manière aléatoire dans une boucle de sorte à ce qu'il n'y ait pas de passagers qui ont le même etage de départ que d'arrivée. Je n'ai mis aucune de simulation de temps d'attente entre la création de chaque passager car je voulais éviter que les passager s'approprient l'ascenceur dans l'ordre et qu'il n'y ait aucune concurrence visible.
+* **Fonction *thread_usager*** : Il s'agit de la fonction thread qui pour chaque passager va verifier que l'ascenseur est libre puis avec un mutex s'approprier l'ascenseur afin d'éviter que deux passager s'approprient l'ascenseur en même temps.
+* **Fonction *thread_ascenseur*** : Il s'agit de la fonction qui attend les passager et simule le déroulement de l'ascenseur. Il y a des sleep pour simuler les pauses et les temps d'attentes.
+* **Fonction afficher_etat** : Il s'agit d'une fonction d'affichage pour gerer l'affichage un peu à la manière d'un diagramme d'état de l'ascenseur et des passagers.
+
 
 ## Usage
 Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
@@ -110,10 +119,14 @@ Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur vo
 gcc -Wall -pthread src/main.c src/simulation_v1.c -o ElevatorSimulation
 ```
 
-un exécutable du nom de ```ElevatorSimulation``` sera créé et il attend en paramètre le nombre d'usagers.
-Pour exécuter :
+un exécutable du nom de ```ElevatorSimulation``` sera créé et il attend en paramètre le nom de la version, le nombre d'usagers et pour la version 2 le nombre de passagers maximal.  
+Pour exécuter la v1 :
 ```bash
-./ElevatorSimulation 4
+./ElevatorSimulation v1 4
+```
+Pour exécuter la v2 : 
+```bash
+./ElevatorSimulation v1 4
 ```
 
 Finalement pour supprimer l'exécutable :
