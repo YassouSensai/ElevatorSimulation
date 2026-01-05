@@ -62,7 +62,7 @@ void *thread_ascenseur(void *arg) {
             int direction = (p.etage_depart > etage_actuel) ? 1 : -1;
 
             while (etage_actuel != p.etage_depart) {
-                usleep(500000);
+                usleep(250000);
                 etage_actuel += direction;
                 afficher_etat(etage_actuel, -1, info);
             }
@@ -70,12 +70,12 @@ void *thread_ascenseur(void *arg) {
 
         // Le passager monte
         afficher_etat(etage_actuel, -1, "Ouverture des portes ...");
-        sleep(1);
+        usleep(500000);
         char info2[50];
         sprintf(info2, "Passager P%d est monté", p.id);
         afficher_etat(etage_actuel, p.id, info2);
         afficher_etat(etage_actuel, p.id, "Fermeture des portes ...");
-        sleep(1);
+        usleep(500000);
 
         // On se rend à l'étage d'arrivée du passager
         if (etage_actuel != p.etage_destination) {
@@ -85,7 +85,7 @@ void *thread_ascenseur(void *arg) {
             int direction = (p.etage_destination > etage_actuel) ? 1 : -1;
 
             while (etage_actuel != p.etage_destination) {
-                usleep(500000); /* 0.5 seconde */
+                usleep(250000); 
                 etage_actuel += direction;
                 afficher_etat(etage_actuel, p.id, info);
             }
@@ -93,7 +93,7 @@ void *thread_ascenseur(void *arg) {
 
         // On dépose le passager
         afficher_etat(etage_actuel, p.id, "Ouverture des portes ...");
-        sleep(1);
+        usleep(500000);
         char info3[50];
         sprintf(info3, "Passager P%d est descendu", p.id);
         afficher_etat(etage_actuel, -1, info3);
@@ -177,10 +177,14 @@ void run_elevator_simulation(int nb_usagers) {
     // Création threads Usagers
     for (int i = 0; i < nb_usagers; i++) {
         donnees_usagers[i].id = i;
-        donnees_usagers[i].etage_depart = rand() % 5;
-        donnees_usagers[i].etage_destination = rand() % 5;
+        int etage_depart, etage_destination;
+        do {
+            etage_depart = rand() % 5;
+            etage_destination = rand() % 5;
+        } while (etage_depart == etage_destination);
+        donnees_usagers[i].etage_depart = etage_depart;
+        donnees_usagers[i].etage_destination = etage_destination;
         pthread_create(&threads_usagers[i], NULL, thread_usager, &donnees_usagers[i]);
-        usleep(200000);
     }
 
     // Attendre que tous les threads se terminent
@@ -194,7 +198,7 @@ void run_elevator_simulation(int nb_usagers) {
             break;
         }
         pthread_mutex_unlock(&mutex_affichage);
-        sleep(1);
+        usleep(500000);
     }
 
 
