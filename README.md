@@ -1,9 +1,22 @@
-# ElevatorSimulation
-> Simulation d'un ascenseur  
-> Auteur : ELKHALKI Yassine  
-> Contact :  
-> * yassine.elkhalki@outlook.fr  
-> * yassine.elkhalki.auditeur@lecnam.net
+<table>
+<tr>
+<td style="vertical-align:top; padding-right:1.5em; width:60%;">
+<h1>ElevatorSimulation</h1>
+<ul>
+<li>Simulation d'un ascenseur</li>  
+<li>Auteur : ELKHALKI Yassine</li>
+<li>Contact :<ul>  
+	<li>yassine.elkhalki@outlook.fr</li>
+	<li>yassine.elkhalki.auditeur@lecnam.net</li>
+	</ul>
+	</li>
+</ul>
+</td>
+<td style="vertical-align:top; text-align:right; width:40%;">
+<img src="./doc/img/leCnam_Logo-2024_CMJN.png" alt="img_cnam" style="max-width:220px;">
+</td>
+</tr>
+</table>
 
 ---
 ## Sommaire
