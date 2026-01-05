@@ -161,7 +161,7 @@ void run_simulation_v1(int nb_usagers) {
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutex_affichage, NULL);
 
-    // Initialisation Sémaphores (Version Mac obligée)
+    // Initialisation Sémaphores (Version Mac)
     // empty = 1 (1 place disponible au départ)
     // full = 0 (0 client au départ)
     sem_unlink("/sem_v1_empty"); 
