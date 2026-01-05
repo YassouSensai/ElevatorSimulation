@@ -165,6 +165,12 @@ L'affichage est géré sous forme de diagramme d'états avec les étages des l'a
 
 
 ## Usage
+
+Tout d'abord, clonez le projet :
+```bash
+git clone https://github.com/YassouSensai/ElevatorSimulation.git
+```
+
 Pour compiler le projet, il faut avoir le compilateur **gcc** d'installé sur votre machine. Pour compiler et obtenir l'éxecutable sur Linux et macOS, rendez vous à la racine du projet, c'est à dire [ici](./) puis éxecutez la commande suivante :
 
 ```bash
